@@ -1,0 +1,6 @@
+public class SuiteRoom extends Room {
+
+    public SuiteRoom() {
+        super("Suite Room", 3, 350);
+    }
+}
