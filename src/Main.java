@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 import java.util.*;
 
-// Reservation class
+// Reservation class (same as UC5)
 class Reservation {
     private String guestName;
     private String roomType;
@@ -18,11 +17,6 @@ class Reservation {
     public String getRoomType() {
         return roomType;
     }
-
-    @Override
-    public String toString() {
-        return "Guest: " + guestName + ", Room Type: " + roomType;
-    }
 }
 
 // Main class
@@ -30,38 +24,68 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ✅ Queue for booking requests
+        //  Booking Queue (FIFO)
         Queue<Reservation> bookingQueue = new LinkedList<>();
 
-        // Simulate booking requests
         bookingQueue.add(new Reservation("Pranav", "Deluxe"));
         bookingQueue.add(new Reservation("Rahul", "Standard"));
-        bookingQueue.add(new Reservation("Anjali", "Suite"));
+        bookingQueue.add(new Reservation("Anjali", "Deluxe"));
 
-        // Display queue (FIFO order)
-        System.out.println("Booking Requests in Queue (FIFO Order):");
+        //  Inventory (room count)
+        Map<String, Integer> inventory = new HashMap<>();
+        inventory.put("Deluxe", 2);
+        inventory.put("Standard", 1);
 
-        for (Reservation r : bookingQueue) {
-            System.out.println(r);
+        //  Track allocated room IDs (no duplicates)
+        Set<String> allocatedRoomIds = new HashSet<>();
+
+        //  Map roomType → allocated IDs
+        Map<String, Set<String>> roomAllocationMap = new HashMap<>();
+
+        int roomCounter = 1;
+
+        System.out.println("Processing Booking Requests...\n");
+
+        //  Process queue
+        while (!bookingQueue.isEmpty()) {
+
+            Reservation request = bookingQueue.poll(); // FIFO
+            String type = request.getRoomType();
+
+            // Check availability
+            if (inventory.getOrDefault(type, 0) > 0) {
+
+                // Generate unique room ID
+                String roomId = type.substring(0, 3).toUpperCase() + "-" + roomCounter++;
+
+                // Ensure uniqueness
+                if (!allocatedRoomIds.contains(roomId)) {
+
+                    allocatedRoomIds.add(roomId);
+
+                    // Store in map
+                    roomAllocationMap
+                            .computeIfAbsent(type, k -> new HashSet<>())
+                            .add(roomId);
+
+                    // Decrement inventory
+                    inventory.put(type, inventory.get(type) - 1);
+
+                    // Confirm booking
+                    System.out.println("Booking Confirmed:");
+                    System.out.println("Guest: " + request.getGuestName()
+                            + ", Room Type: " + type
+                            + ", Room ID: " + roomId + "\n");
+                }
+
+            } else {
+                System.out.println("Booking Failed (No Rooms Available): "
+                        + request.getGuestName() + " (" + type + ")\n");
+            }
         }
 
-        // Peek next request (no removal)
-        System.out.println("\nNext Request to Process:");
-        System.out.println(bookingQueue.peek());
+        // Final state
+        System.out.println("Final Inventory: " + inventory);
+        System.out.println("Allocated Room IDs: " + allocatedRoomIds);
     }
 }
-=======
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-void main() {
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    IO.println(String.format("Hello and welcome!"));
-
-    for (int i = 1; i <= 5; i++) {
-        //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-        // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        IO.println("i = " + i);
-    }
-}
->>>>>>> d24eafb69947e3736c3c6117673a660852f57e98
